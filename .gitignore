@@ -1,0 +1,7 @@
+# Generated JSON
+*.json
+
+# Python
+__pycache__/
+*.pyc
+.env
