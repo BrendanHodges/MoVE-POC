@@ -1,24 +1,27 @@
 from app.db import get_db_connection
 import pandas as pd
 
-def fetch_move_equation_scores():
+from app.db import get_db_connection
+import pandas as pd
 
+def fetch_move_equation_scores():
     def get_move_equation_scores() -> pd.DataFrame:
         conn = get_db_connection()
         cur = conn.cursor()
 
         query = """
         SELECT
-            C.County_id,
+            C.county_id,
             C.name AS county_name,
+            C.state_id AS state_id,
             Q.question_id,
             Q.question,
             Q.category,
             R.value AS response_value
         FROM Responses R
-        JOIN Counties  C ON C.County_id   = R.County_id
+        JOIN Counties C ON C.county_id = R.county_id
         JOIN Questions Q ON Q.question_id = R.question_id
-        ORDER BY C.County_id, Q.question_id
+        ORDER BY C.county_id, Q.question_id
         """
         cur.execute(query)
         rows = cur.fetchall()
@@ -29,14 +32,14 @@ def fetch_move_equation_scores():
 
     def build_category_scores(df: pd.DataFrame) -> pd.DataFrame:
         df_cat = (
-            df.groupby(["County_id", "county_name", "category"], as_index=False)["response_value"]
+            df.groupby(["county_id", "county_name", "state_id", "category"], as_index=False)["response_value"]
             .sum()
             .rename(columns={"response_value": "category_score"})
         )
 
         df_wide = (
             df_cat.pivot_table(
-                index=["County_id", "county_name"],
+                index=["county_id", "county_name", "state_id"],
                 columns="category",
                 values="category_score",
                 aggfunc="first"
@@ -55,7 +58,7 @@ def fetch_move_equation_scores():
         df = df.drop(columns=["Abuses"], errors="ignore")
 
         # Category columns = everything except IDs/names
-        id_cols = ["County_id", "county_name"]
+        id_cols = ["county_id", "county_name", "state_id"]
         cat_columns = [c for c in df.columns if c not in id_cols]
 
         # Make sure category columns are numeric and fill missing scores with 0
@@ -106,16 +109,38 @@ def fetch_move_equation_scores():
     # Score and export (MoVE equation)
     df_scored = score(df_cat_wide)
 
-    df_scored = df_scored[['County_id', 'county_name', 'move_score_0_100']]
+    df_scored = df_scored[['county_id', 'county_name', 'state_id', 'move_score_0_100']]
 
-    #Turns dataframe into dictionary format suitable for javascript
-    countyScores = {
-    str(row['County_id']): {
-        "name": row['county_name'],
-        "score": round(row['move_score_0_100'], 2)
-    }
-    for _, row in df_scored.iterrows()
-    }
+    return df_scored
 
-    return countyScores
+def fetch_county_census_data(county_id: int) -> dict:
+    conn = get_db_connection()
 
+    query = """
+    SELECT
+        v.name AS variable,
+        f.data AS value
+    FROM census_facts f
+    JOIN census_variables v
+      ON f.variable_id = v.variable_id
+    WHERE f.county_id = ?
+      AND v.name IN (
+        'Overall Population',
+        'Overall median earnings',
+        'Estimate of the population (25 years and over) with a Bachelor’s degree (regardless of place of birth)'
+      );
+    """
+
+    df = pd.read_sql(query, conn, params=(county_id,))
+    conn.close()
+
+    # Rename the VARIABLE VALUE, not the column
+    df["variable"] = df["variable"].replace({
+        "Estimate of the population (25 years and over) with a Bachelor’s degree (regardless of place of birth)":
+        "Overall Bachelor's degree population"
+    })
+
+    # Convert to dict
+    data_dict = df.set_index("variable")["value"].to_dict()
+
+    return data_dict

@@ -2,8 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.queries import fetch_move_equation_scores
+from app.queries import fetch_move_equation_scores, fetch_county_census_data
 from fastapi import Query, HTTPException
+import pandas as pd
 
 app = FastAPI()
 
@@ -26,8 +27,47 @@ def read_root(request: Request):
         {"request": request}
     )
 
-# WHEN Fetch request is made it leads directly to this function (Check queries to see how data is pulled)
+@app.get('/api/state-scores')
+def state_MoVE_score():
+    countyScores = fetch_move_equation_scores()
+    stateScores = countyScores.groupby('state_id').agg(
+        {
+            'move_score_0_100': 'mean',
+            'county_id': 'count'
+        }
+    ).reset_index()
+
+    stateScoresDict = {
+        str(row['state_id']): {
+            "score": round(row['move_score_0_100'], 2),
+        }
+        for _, row in stateScores.iterrows()
+    }
+
+    return stateScoresDict
+
 @app.get('/api/county-scores')
 def county_MoVE_score():
     data = fetch_move_equation_scores()
-    return data
+    print(f"Raw Data: {data}")
+    countyScores = {
+        str(row['county_id']): {
+            "name": row['county_name'],
+            "score": round(row['move_score_0_100'], 2)
+        }
+        for _, row in data.iterrows()
+        }
+    print(f"County Scores: {countyScores}")
+    return countyScores
+
+# @app.get('/api/county-census{county_id}')
+# def county_census_data(county_id: str = Query(..., description="The GEOID of the county")):
+#     data = fetch_county_census_data(county_id)
+    
+#     county_data = data[data['county_id'] == int(county_id)]
+
+#     if county_data.empty:
+#         raise HTTPException(status_code=404, detail="County not found")
+
+
+#     return census_data
