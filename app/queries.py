@@ -60,11 +60,7 @@ def fetch_move_equation_scores():
 
         # Make sure category columns are numeric and fill missing scores with 0
         df[cat_columns] = df[cat_columns].apply(pd.to_numeric, errors="coerce").fillna(0)
-
-        # Debug: show standard deviations (raw)
-        print("Standard deviations (raw category scores):")
-        print(df[cat_columns].std())
-
+    
         # Z-score standardize with zero-variance protection
         df_z = df.copy()
         for col in cat_columns:

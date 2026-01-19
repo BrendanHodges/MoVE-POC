@@ -63,7 +63,7 @@ async function loadStateScores() {
 }
 
 async function loadStatesGeo() {
-  const res = await fetch("/static/data/us_states.json");
+  const res = await fetch("https://raw.githubusercontent.com/BrendanHodges/DATA-ACCESS/refs/heads/main/us_states.json");
   if (!res.ok) throw new Error(`us_states.json failed: ${res.status}`);
   return res.json();
 }

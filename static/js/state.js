@@ -107,7 +107,7 @@ function onEachCounty(feature, layer) {
 async function loadCountyGeoForState(stateFP) {
   // Load master counties once
   if (!App.usCountiesData) {
-    const res = await fetch("/static/data/us_counties.json");
+    const res = await fetch("https://raw.githubusercontent.com/BrendanHodges/DATA-ACCESS/refs/heads/main/us_counties.json");
     if (!res.ok) {
       throw new Error(`us_counties.json failed: ${res.status}`);
     }
