@@ -1,9 +1,6 @@
 from app.db import get_db_connection
 import pandas as pd
 
-from app.db import get_db_connection
-import pandas as pd
-
 def fetch_move_equation_scores():
     def get_move_equation_scores() -> pd.DataFrame:
         conn = get_db_connection()
@@ -113,34 +110,43 @@ def fetch_move_equation_scores():
 
     return df_scored
 
-def fetch_county_census_data(county_id: int) -> dict:
+def fetch_state_counties_census_data(state_id) -> dict:
     conn = get_db_connection()
 
     query = """
     SELECT
+        c.county_id,
+        c.name AS county_name,
         v.name AS variable,
         f.data AS value
     FROM census_facts f
     JOIN census_variables v
       ON f.variable_id = v.variable_id
-    WHERE f.county_id = ?
+    JOIN counties c
+      ON f.county_id = c.county_id
+    WHERE c.state_id = ?
       AND v.name IN (
         'Overall Population',
         'Overall median earnings',
         'Estimate of the population (25 years and over) with a Bachelor’s degree (regardless of place of birth)'
-      );
+      )
+    ORDER BY c.county_id, v.name;
     """
 
-    df = pd.read_sql(query, conn, params=(county_id,))
+    df = pd.read_sql(query, conn, params=(state_id,))
     conn.close()
 
-    # Rename the VARIABLE VALUE, not the column
     df["variable"] = df["variable"].replace({
         "Estimate of the population (25 years and over) with a Bachelor’s degree (regardless of place of birth)":
         "Overall Bachelor's degree population"
     })
 
-    # Convert to dict
-    data_dict = df.set_index("variable")["value"].to_dict()
+    # nested dict: {county_id: {"county_name": "...", "data": {variable: value}}}
+    out = {}
+    for (county_id, county_name), sub in df.groupby(["county_id", "county_name"]):
+        out[county_id] = {
+            "county_name": county_name,
+            "data": sub.set_index("variable")["value"].to_dict()
+        }
 
-    return data_dict
+    return out

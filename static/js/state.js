@@ -1,16 +1,46 @@
 ///STYLE FUNCTIONS IN STATE VIEW///
 function showCountySidebar(feature) {
-  const geoid = feature.properties.GEOID;
+  const geoid = String(feature.properties.GEOID);      // county GEOID (usually 5 digits)
   const score = App.getCountyScore(geoid);
 
-  document.getElementById('sidebar').innerHTML = `
-    <button onclick="showStateSidebar(App.selectedStateName, App.selectedStateFP)" class="sidebar-button">Back to State</button>
+  const stateData = App.StateCensusData || {};
+  const censusObj =
+    stateData[String(Number(geoid)).padStart(5, "0")] ||
+    null;
+
+  const d = censusObj?.data || {};
+
+  const popRaw = d["Overall Population"];
+  const earnRaw = d["Overall median earnings"];
+  const bachRaw = d["Overall Bachelor's degree population"];
+
+  const pop = popRaw != null && popRaw !== "" ? Number(popRaw).toLocaleString() : "N/A";
+  const earn = earnRaw != null && earnRaw !== "" ? `$${Number(earnRaw).toLocaleString()}` : "N/A";
+  const bach = bachRaw != null && bachRaw !== "" ? Number(bachRaw).toLocaleString() : "N/A";
+
+  document.getElementById("sidebar").innerHTML = `
+    <button onclick="showStateSidebar(App.selectedStateName, App.selectedStateFP)" class="sidebar-button">
+      Back to State
+    </button>
+
     <h2>${feature.properties.NAME} County</h2>
 
-    <p><strong>MoVE Score:</strong> ${score ?? 'N/A'}</p>
-    <p><strong>Population:</strong> N/A</p>
+    <p><strong>MoVE Score:</strong> ${score ?? "N/A"}</p>
+
+    <h3 style="margin-top:12px;">County Demographics</h3>
+
+    ${
+      censusObj
+        ? `<ul style="list-style:none; padding-left:0; margin-top:8px;">
+            <li><strong>Population:</strong> ${pop}</li>
+            <li><strong>Median Earnings:</strong> ${earn}</li>
+            <li><strong>Bachelor’s Degree Population:</strong> ${bach}</li>
+          </ul>`
+        : `<p style="margin-top:8px;">Census data not available for GEOID ${geoid}.</p>`
+    }
   `;
 }
+
 
 function showStateSidebar(stateName, stateFP) {
   const avg = App.getStateScore(stateFP);
@@ -117,7 +147,16 @@ async function loadCountyScoresForState(stateFP) {
   App.countyScores = filtered;
 }
 
+async function loadStateCensusData(stateFP) {
+  const res = await fetch(`/api/state-census/${stateFP}`);
 
+  if (!res.ok) {
+    throw new Error(`State census fetch failed: ${res.status}`);
+  }
+
+  App.StateCensusData = await res.json();
+  console.log(App.StateCensusData);
+}
 
 /// INITIALIZATION STATE VIEW FUNCTIONS ///
 async function showCountiesForState(stateFP) { 
@@ -125,7 +164,8 @@ async function showCountiesForState(stateFP) {
 
   await Promise.all([
     loadCountyGeoForState(stateFP),
-    loadCountyScoresForState(stateFP)
+    loadCountyScoresForState(stateFP),
+    loadStateCensusData(stateFP)
   ]);
 
   App.activeCountyLayer = L.geoJSON(App.selectedCountiesData, {

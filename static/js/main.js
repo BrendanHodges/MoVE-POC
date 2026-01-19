@@ -19,21 +19,22 @@ window.App = {
   activeCountyLayer: null,
 
   // geo
-  usStatesData: null,
-  usCountiesData: null,
-  selectedCountiesData: null, 
+  usStatesData: null,  // US states GeoJSON Data
+  usCountiesData: null, // State countiesn GeoJSON Data
+  selectedCountiesData: null, // Currently Loaded State Counties GeoJSON Data
 
   // selection
-  selectedStateFP: null,
+  selectedStateFP: null, //
   selectedStateName: null,
 
   // scores
-  stateScores: {},   
-  countyScores: {},
-  allCountyScores: {},  
+  stateScores: {}, // States average MoVE or other metric scores
+  countyScores: {}, //Currently selected States counties MoVE or other metric scores
+  allCountyScores: {}, // All counties MoVE or other metric scores
 
-  // populations
-  countyPopulation: {},
+  // Census Data
+  StateCensusData: {}, // All Census Data for selected state
+  selectedCountyCensusData: {}, // Currently selected County Displayed Census Data
 
   // helpers
   getStateScore(stateFP) {
