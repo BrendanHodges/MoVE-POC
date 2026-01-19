@@ -125,7 +125,7 @@ async function loadCountyGeoForState(stateFP) {
 
 async function loadCountyScoresForState(stateFP) {
   // Load once
-  if (App.allCountyScores) { 
+  if (Object.keys(App.allCountyScores).length === 0) {
     const res = await fetch("/api/county-scores");
     if (!res.ok) {
       throw new Error(`/api/county-scores failed: ${res.status}`);
