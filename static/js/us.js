@@ -1,11 +1,11 @@
 /////HELPER FUNCTIONS FOR US VIEW/////
 function getColor(score) {
-    return score > 80 ? "#003049" :
-           score > 60 ? "#669BBC" :
-           score > 40 ? "#FDF0D5" :
-           score > 20 ? "#C1121F" : "#780000";
-  }
-
+  return score > 80 ? "#1a9850" :   // dark green (very good)
+         score > 60 ? "#66bd63" :   // light green
+         score > 40 ? "#4575b4" :   // blue (middle)
+         score > 20 ? "#f46d43" :   // light red / orange
+                      "#d73027";    // dark red (very bad)
+}
 
 
 
