@@ -97,3 +97,14 @@ async function init() {
 }
 
 init();
+
+//--------------------
+// 4) Additional Shared Functions
+//--------------------
+function showDashboardLoading() {
+  document.getElementById('dashboard-loading').style.display = 'flex';
+}
+
+function hideDashboardLoading() {
+  document.getElementById('dashboard-loading').style.display = 'none';
+}

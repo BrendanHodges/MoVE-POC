@@ -51,7 +51,6 @@ def fetch_move_equation_scores():
     def score(df_final: pd.DataFrame) -> pd.DataFrame:
         df = df_final.copy()
 
-        # If you truly want to remove Abuses, do it safely:
         df = df.drop(columns=["Abuses"], errors="ignore")
 
         # Category columns = everything except IDs/names
@@ -104,6 +103,8 @@ def fetch_move_equation_scores():
 
     df_scored = df_scored[['county_id', 'county_name', 'state_id', 'move_score_0_100']]
 
+    df_scored['move_score_0_100'] = df_scored['move_score_0_100'].round(1)
+
     return df_scored
 
 def fetch_state_counties_census_data(state_id) -> dict:
@@ -137,7 +138,6 @@ def fetch_state_counties_census_data(state_id) -> dict:
         "Overall Bachelor's degree population"
     })
 
-    # nested dict: {county_id: {"county_name": "...", "data": {variable: value}}}
     out = {}
     for (county_id, county_name), sub in df.groupby(["county_id", "county_name"]):
         out[county_id] = {

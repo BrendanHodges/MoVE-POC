@@ -8,3 +8,5 @@ __pycache__/
 
 test.py
 yes.js
+databaseCheck.py
+MoVE - safe.db

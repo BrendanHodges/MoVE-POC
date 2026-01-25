@@ -9,7 +9,6 @@ function getColor(score) {
 
 
 
-
 /////STYLE & LEGEND FUNCTIONS////
 function addScoreLegend() {
   if (App.legendControl) {
@@ -93,7 +92,7 @@ function showUSSidebar() {
     <ul>
       ${states.map(s => `
         <li>
-          ${s.name}: <strong>${s.score.toFixed(2)}</strong>
+          ${s.name}: <strong>${s.score.toFixed(1)}</strong>
         </li>
       `).join("")}
     </ul>
@@ -102,17 +101,14 @@ function showUSSidebar() {
 
 
 
-
-
-
-/////INTERACTION FUNCTIONS/////
+////INTERACTION FUNCTIONS////
 function onEachState(feature, layer) {
   const stateFP = String(feature.properties.STATEFP).padStart(2, "0");
-  const score = App.stateScores?.[stateFP]?.score ?? null;
+  const score = App.getStateScore(stateFP);
 
   layer.bindTooltip(
     `<strong>${feature.properties.NAME}</strong><br/>
-     Score: ${score != null ? score.toFixed(2) : "N/A"}`,
+     Score: ${score != null ? score.toFixed(1) : "N/A"}`,
     {
       sticky: true,
       direction: "top",
@@ -133,24 +129,18 @@ function handleStateClick(feature, layer) {
 
 
 
-
-
-
 ///////STYLE INITIALIZATION/////
 function stateStyle(feature) {
     const stateFP = feature.properties.STATEFP;
-    const score = App.stateScores?.[stateFP]?.score ?? null;
+    const score = App.getStateScore(stateFP);
 
     return {
       fillColor: score != null ? getColor(score) : "#ccc",
       weight: 1,
       color: "#003049",
-      fillOpacity: 0.7
+      fillOpacity: 0.5
     };
   }
-
-
-
 
 
 

@@ -45,20 +45,33 @@
       <div class="controls">
         <label for="metricSelect">Select Variable:</label>
         <select id="metricSelect">
-          <option value="electoral_integrity">Measurement of Voting Equity Score</option>
+          <option value="electoral_integrity">Measurement of Voting Equity Index</option>
           <option value="another_metric">Another Metric</option>
         </select>
+          <p style="margin-top: 6px; font-size: 11px; font-style: italic; color: #555;">
+            *Measurement of Voting Equity Index values are displayed on the map.*
+          </p>
       </div>
 
       <div id="dashboard">
+        <div id="dashboard-loading" class="is-hidden">
+          <div class="spinner"></div>
+          <p>Loading...</p>
+        </div>
+
         <aside id="sidebar">
           <h3 id="sidebar-title">United States</h3>
           <p id="sidebar-subtitle">Select a state to view details.</p>
           <div id="county-details"></div>
         </aside>
 
-        <div id="map"></div>
+        <div id="map"></div> 
       </div>
+        <div>
+          <p style="margin-top: 6px; font-size: 14px; font-style: italic; color: #555; text-align: center;">
+            *Values on map reflect the selected variable.*
+          </p>
+        </div>
     </section>
   </main>
 
