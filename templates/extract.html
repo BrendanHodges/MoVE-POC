@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MoVE Data Extraction</title>
+  <link rel="stylesheet" href="/static/css/site.css" />
+</head>
+
+<body>
+  <main class="container">
+
+    <!-- Page header -->
+    <div class="dashboard-header">
+      <h2>Data Extraction</h2>
+    </div>
+
+    <p class="intro">
+      Filter and export MoVE data for research and analysis.
+    </p>
+
+    <!-- Extractor layout -->
+    <div id="extractor" style="display:flex; gap:12px; position:relative;">
+
+      <!-- Filters -->
+      <aside id="extract-filters"
+             style="width:320px; border:1px solid var(--border); padding:12px;">
+        <h3>Filters</h3>
+
+        <label>Variable</label>
+        <select id="variable-select" class="county-dropdown"></select>
+
+        <label>State</label>
+        <select id="state-select" class="county-dropdown"></select>
+
+        <label>County</label>
+        <select id="county-select" class="county-dropdown"></select>
+
+        <label>Year</label>
+        <select id="year-select" class="county-dropdown"></select>
+
+        <div style="margin-top:12px; display:flex; gap:8px;">
+          <button class="tab-button" id="preview-btn">Preview</button>
+          <button class="tab-button" id="clear-btn">Clear</button>
+        </div>
+
+        <hr>
+
+        <h3>Export</h3>
+        <button class="tab-button" id="export-csv">Export CSV</button>
+        <button class="tab-button" id="export-json">Export JSON</button>
+      </aside>
+
+      <!-- Preview -->
+      <section style="flex:1; border:1px solid var(--border); padding:12px;">
+        <h3>Preview Results</h3>
+
+        <div id="preview-table-wrapper" style="overflow:auto;">
+          <table id="preview-table" style="width:100%; border-collapse:collapse;">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Loading overlay -->
+      <!-- <div id="extract-loading" class="is-hidden"
+           style="position:absolute; inset:0; background:rgba(255,255,255,0.85);
+                  display:flex; flex-direction:column; align-items:center; justify-content:center;">
+        <div class="spinner"></div>
+        <div>Loading…</div>
+      </div> -->
+
+    </div>
+  </main>
+
+  <script src="/static/extract.js"></script>
+</body>
+</html>

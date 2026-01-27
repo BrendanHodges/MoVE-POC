@@ -15,7 +15,7 @@
       <h1 class="site-title">Measurement of Voting Equity (MoVE)</h1>
       <nav class="site-nav">
         <a href="#">Home</a>
-        <a href="#dashboard">Dashboard</a>
+        <a href="#dashboard-section">Dashboard</a>
         <a href="#">Data</a>
         <a href="#">Methods</a>
         <a href="#">Publications</a>
@@ -32,46 +32,64 @@
       </p>
     </section>
 
-    <section class="dashboard-section">
+    <section class="dashboard-section" id="dashboard-section">
       <div class="dashboard-header">
         <h2>Data Dashboard</h2>
 
         <div class="dashboard-buttons">
-          <button class="tab-button is-active">Interactive Map</button>
-          <button class="tab-button">Data Extraction</button>
+          <button class="tab-button is-active" id="map-tab" type="button">
+            Interactive Map
+          </button>
+          <button class="tab-button" id="extract-tab" type="button">
+            Data Extraction
+          </button>
         </div>
       </div>
 
-      <div class="controls">
+      <!-- MAP CONTROLS (only shown on map tab) -->
+      <div class="controls" id="map-controls">
         <label for="metricSelect">Select Variable:</label>
         <select id="metricSelect">
           <option value="electoral_integrity">Measurement of Voting Equity Index</option>
           <option value="another_metric">Another Metric</option>
         </select>
-          <p style="margin-top: 6px; font-size: 11px; font-style: italic; color: #555;">
-            *Measurement of Voting Equity Index values are displayed on the map.*
-          </p>
+        <p style="margin-top: 6px; font-size: 11px; font-style: italic; color: #555;">
+          *Measurement of Voting Equity Index values are displayed on the map.*
+        </p>
       </div>
 
-      <div id="dashboard">
-        <div id="dashboard-loading" class="is-hidden">
-          <div class="spinner"></div>
-          <p>Loading...</p>
+      <!-- MAP VIEW (toggle this) -->
+      <div id="map-view">
+        <div id="dashboard">
+          <div id="dashboard-loading" class="is-hidden">
+            <div class="spinner"></div>
+            <p>Loading...</p>
+          </div>
+
+          <aside id="sidebar">
+            <h3 id="sidebar-title">United States</h3>
+            <p id="sidebar-subtitle">Select a state to view details.</p>
+            <div id="county-details"></div>
+          </aside>
+
+          <div id="map"></div>
         </div>
 
-        <aside id="sidebar">
-          <h3 id="sidebar-title">United States</h3>
-          <p id="sidebar-subtitle">Select a state to view details.</p>
-          <div id="county-details"></div>
-        </aside>
-
-        <div id="map"></div> 
-      </div>
-        <div>
+        <div id="map-footer-note">
           <p style="margin-top: 6px; font-size: 14px; font-style: italic; color: #555; text-align: center;">
             *Values on map reflect the selected variable.*
           </p>
         </div>
+      </div>
+
+      <!-- EXTRACT VIEW (toggle this) -->
+      <div id="extract-view" class="is-hidden">
+        <iframe
+          title="MoVE Data Extraction"
+          src="/extract"
+          style="width: 100%; height: 700px; border: none;"
+        ></iframe>
+      </div>
     </section>
   </main>
 
@@ -85,5 +103,46 @@
   <script src="/static/js/us.js"></script>
   <script src="/static/js/state.js"></script>
   <script src="/static/js/main.js"></script>
+
+  <!-- Tab logic: show map-view or extract-view -->
+  <script>
+    (function () {
+      const mapTab = document.getElementById("map-tab");
+      const extractTab = document.getElementById("extract-tab");
+
+      const mapView = document.getElementById("map-view");
+      const extractView = document.getElementById("extract-view");
+      const mapControls = document.getElementById("map-controls");
+
+      function showMap() {
+        mapView.classList.remove("is-hidden");
+        extractView.classList.add("is-hidden");
+        mapControls.classList.remove("is-hidden");
+
+        mapTab.classList.add("is-active");
+        extractTab.classList.remove("is-active");
+
+        // Leaflet needs a resize refresh after being re-shown
+        if (window.map && typeof window.map.invalidateSize === "function") {
+          setTimeout(() => window.map.invalidateSize(), 50);
+        }
+      }
+
+      function showExtract() {
+        mapView.classList.add("is-hidden");
+        extractView.classList.remove("is-hidden");
+        mapControls.classList.add("is-hidden");
+
+        extractTab.classList.add("is-active");
+        mapTab.classList.remove("is-active");
+      }
+
+      mapTab.addEventListener("click", showMap);
+      extractTab.addEventListener("click", showExtract);
+
+      // default
+      showMap();
+    })();
+  </script>
 </body>
 </html>

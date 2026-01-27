@@ -62,3 +62,10 @@ def state_census_data(state_id: str):
     if not census_data:
         raise HTTPException(status_code=404, detail="State not found")
     return census_data
+
+@app.get("/extract")
+def extract(request: Request):
+    return templates.TemplateResponse(
+        "extract.html",
+        {"request": request}
+    )

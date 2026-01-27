@@ -72,6 +72,7 @@ async function loadStatesGeo() {
 // 3) BOOTSTRAP
 // --------------------
 async function init() {
+  showDashboardLoading();
   try {
     const [stateScores, statesGeo] = await Promise.all([
       loadStateScores(),
@@ -93,6 +94,9 @@ async function init() {
       <h2>Error</h2>
       <p>Failed to load state data.</p>
     `;
+  }
+  finally {
+    hideDashboardLoading();
   }
 }
 

@@ -27,14 +27,14 @@ function showCountySidebar(feature) {
 
     <p><strong>MoVE Score:</strong> ${score ?? "N/A"}</p>
 
-    <h3 style="margin-top:12px;">County Demographics</h3>
+    <h3 style="margin-top:12px;">County Demographics:</h3>
 
     ${
       censusObj
         ? `<ul style="list-style:none; padding-left:0; margin-top:8px;">
-            <li><strong>Population:</strong> ${pop}</li>
-            <li><strong>Median Earnings:</strong> ${earn}</li>
-            <li><strong>Bachelor’s Degree Population:</strong> ${bach}</li>
+            <li><strong>- Population:</strong> ${pop}</li>
+            <li><strong>- Median Earnings:</strong> ${earn}</li>
+            <li><strong>- Bachelor’s Degree Population:</strong> ${bach}</li>
           </ul>`
         : `<p style="margin-top:8px;">Census data not available for GEOID ${geoid}.</p>`
     }
@@ -59,13 +59,13 @@ function showStateSidebar(stateName, stateFP) {
     <h2>${stateName}</h2>
     <p><strong>Average MoVE Score:</strong> ${avg != null ? avg.toFixed(1) : 'N/A'}</p>
 
-    <h3>Election & Voting Info</h3>
+    <h3>Election & Voting Info</h3><p>More details coming soon!</p><br/><br/>
     
     <button
-      class="sidebar-button"
+      class="dropdown-button"
       onclick="toggleCountyList()"
     >
-      Show Counties
+      Show Counties MoVe Scores
     </button>
 
     <ul id="county-list" class="is-hidden">
