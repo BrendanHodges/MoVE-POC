@@ -50,16 +50,13 @@ body {
   color: var(--muted);
 }
 
-.dashboard-section {
-  margin-bottom: 40px;
+#dashboard-section {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  background: #ffffff;
 }
 
-.county-dropdown {
-  width: 100%;
-  padding: 6px;
-  margin-top: 6px;
-  font-size: 14px;
-}
 
 .dashboard-header {
   display: flex;
@@ -235,3 +232,256 @@ body {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+
+/* =========================================
+CSS FOR THE EXTRACTOR PAGE
+   ========================================= */
+
+.extractor-page {
+  padding-top: 18px;
+  padding-bottom: 24px;
+}
+
+.extractor-header {
+  margin-bottom: 12px;
+}
+
+.extractor-header h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.extractor-header p {
+  margin: 6px 0 0 0;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+/* Layout */
+#extractor-layout {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+#extractor-filters,
+#extractor-preview {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* Left panel */
+#extractor-filters {
+  width: 360px;
+  padding: 14px;
+  overflow: auto;
+  max-height: calc(100vh - 100px);
+}
+
+#extractor-filters h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+}
+
+#extractor-filters label {
+  font-size: 0.9rem;
+}
+
+#extractor-filters input[type="text"],
+#extractor-filters select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #fff;
+}
+
+#extractor-filters input[type="text"]:focus,
+#extractor-filters select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,48,73,0.12);
+}
+
+#extractor-filters input[disabled],
+#extractor-filters select[disabled] {
+  background: #f7f7f7;
+  color: #777;
+  cursor: not-allowed;
+}
+
+#extractor-filters fieldset {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 0 0 10px 0;
+  background: #fafafa;
+}
+
+#extractor-filters legend {
+  padding: 0 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+#extractor-filters hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 14px 0;
+}
+
+/* Buttons */
+#extractor-filters .tab-button {
+  border-radius: 8px;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.02s ease;
+}
+
+#extractor-filters .tab-button:hover {
+  border-color: var(--accent);
+}
+
+#extractor-filters .tab-button:active {
+  transform: translateY(1px);
+}
+
+#extractor-filters .tab-button.primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+#extractor-filters .tab-button.primary:hover {
+  filter: brightness(0.95);
+}
+
+#extractor-filters .action-row,
+#extractor-filters .export-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+/* Right panel */
+#extractor-preview {
+  flex: 1;
+  padding: 14px;
+  min-height: 560px;
+}
+
+#extractor-preview h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+#selected-variables {
+  margin-top: 10px;
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 56px;
+  background: #fcfcfc;
+}
+
+/* “chips” for selected variables (when you render them) */
+.selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 6px 6px 0 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.88rem;
+}
+
+.selected-chip button {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.selected-chip button:hover {
+  color: var(--accent);
+}
+
+/* Preview table styling */
+#preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+#preview-table thead th {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+#preview-table tbody td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  vertical-align: top;
+}
+
+#preview-table tbody tr:hover td {
+  background: #fbfbfb;
+}
+
+/* Message area */
+#extractor-messages {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.message {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+  background: #fcfcfc;
+}
+
+.message.error {
+  border-color: #e8b4b4;
+  background: #fff7f7;
+  color: #8a1f1f;
+}
+
+.message.success {
+  border-color: #bfe3c0;
+  background: #f7fff7;
+  color: #1f5f2a;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  #extractor-layout {
+    flex-direction: column;
+  }
+
+  #extractor-filters {
+    width: 100%;
+    max-height: none;
+  }
+
+  #extractor-preview {
+    min-height: 420px;
+  }
+}
+
