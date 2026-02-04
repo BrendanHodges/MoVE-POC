@@ -1,5 +1,4 @@
 from app.db import get_db_connection
-from db_check2 import fetch_move_equation_scores_slow
 import pandas as pd
 
 conn = get_db_connection()
@@ -252,9 +251,5 @@ while True:
     else:
         print("Please enter Y or N.")
 
-run_scores = input("\n5. Get MoVE Scores One Step at a time (Y or N): ")
-if run_scores.lower() == 'y':
-    print("\n==============================================")
-    print("Getting MoVE Scores...")
-    fetch_move_equation_scores_slow()
+
 
