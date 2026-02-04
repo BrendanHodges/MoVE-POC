@@ -7,6 +7,12 @@
 
   <!-- reuse your dashboard styling -->
   <link rel="stylesheet" href="/static/css/site.css" />
+
+  <!-- Tabulator CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.1/dist/css/tabulator.min.css">
+
+  <!-- Tabulator JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
 </head>
 
 <body>
@@ -150,6 +156,9 @@
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
           <button type="button" class="tab-button" id="previewBtn">Preview</button>
           <button type="button" class="tab-button" id="clearBtn">Clear</button>
+          <button type="button" class="tab-button" id="showFullBtn" disabled>
+            Show Full Table
+          </button>
         </div>
 
         <div style="margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap;">
@@ -164,7 +173,7 @@
 
       <!-- RIGHT: Selected variables + preview -->
       <section id="extractor-preview"
-               style="flex: 1; border: 1px solid var(--border); padding: 12px; min-height: 560px;">
+               style="flex: 1; min-width: 0; border: 1px solid var(--border); padding: 12px; min-height: 560px;">
 
         <!-- Selected variables summary -->
         <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
@@ -188,7 +197,7 @@
         <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
           <h3 style="margin: 0;">Preview Table</h3>
           <div style="color: var(--muted); font-size: 0.9rem;">
-            Showing up to <span id="preview-limit">100</span> rows
+            Showing up to <span id="preview-limit">30</span> rows and 6 columns from your extraction
           </div>
         </div>
 
@@ -196,22 +205,29 @@
           Preview is for confirmation only. Exports may include more rows depending on your selection.
         </p>
 
-        <div id="preview-table" style="overflow: auto; border: 1px solid var(--border);">
-          <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem;">
-            <thead>
-              <tr>
-                <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style="padding: 8px; color: var(--muted);">
-                  Click “Preview” to load sample rows based on your selections.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div id="preview-table" style="border: 1px solid var(--border); overflow-x: auto; overflow-y: auto;">
+          <!-- Placeholder state (what you want to restore to on Clear) -->
+          <div id="preview-placeholder">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.92rem;">
+              <thead>
+                <tr>
+                  <th style="text-align:left; padding:8px; border-bottom:1px solid var(--border);">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="padding: 8px; color: var(--muted);">
+                    Click “Preview” to load sample rows based on your selections.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Tabulator will render here -->
+          <div id="preview-grid"></div>
         </div>
+
 
         <!-- Optional footer area for messages -->
         <div id="extractor-messages" style="margin-top: 10px; color: var(--muted); font-size: 0.9rem;">
@@ -222,6 +238,27 @@
   </main>
 
   <script src="/static/js/extract.js"></script>
-  
+
+  <div id="fullTableModal"
+     style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:9999; padding:24px;">
+
+  <div style="background: var(--bg, white); border:1px solid var(--border);
+              width:min(1200px, 96vw); height:min(720px, 92vh);
+              margin:0 auto; padding:12px; display:flex; flex-direction:column;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <div style="font-size:1rem;">Full Table</div>
+
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" class="tab-button" id="downloadFullCsvBtn">Download CSV</button>
+        <button type="button" class="tab-button" id="closeFullBtn">Close</button>
+      </div>
+    </div>
+
+    <hr style="border:none; border-top:1px solid var(--border); margin:10px 0;">
+
+    <div id="full-grid" style="flex:1; min-height:0;"></div>
+  </div>
+</div>
 </body>
 </html>
