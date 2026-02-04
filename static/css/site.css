@@ -57,6 +57,11 @@ body {
   background: #ffffff;
 }
 
+#preview-table { max-width: 100%; }
+
+#preview-grid  { min-width: max-content; } 
+
+#preview-grid { display: inline-block; }
 
 .dashboard-header {
   display: flex;
