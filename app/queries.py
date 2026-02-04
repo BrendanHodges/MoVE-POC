@@ -1,4 +1,4 @@
-from git import List
+from typing import List
 from app.db import get_db_connection
 import pandas as pd
 
