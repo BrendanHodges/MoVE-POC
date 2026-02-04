@@ -5,7 +5,7 @@ const selectedVariables = {
     states: [],         
     counties: []        
   },
-  includeMoveScore: false,
+  includeMoveScore: true,
   variables: {
     county: [],
     state: [],
@@ -42,6 +42,9 @@ const previewTableBody = previewTable.querySelector("tbody");
 
 //Messages
 const extractorMessages = document.getElementById("extractor-messages");
+
+//Preview Table
+let previewTabulator = null;
 
 //Helper Functions
 function parseCsvList(raw) {
@@ -270,15 +273,11 @@ function removeSelectedVariable(varTypeKey, idToRemove) {
 function addVariableToState(varTypeKey, selectEl) {
   const value = selectEl.value;
   if (!value) return;
-
   const label = selectEl.options[selectEl.selectedIndex].textContent;
   const arr = selectedVariables.variables[varTypeKey];
-
   const alreadyExists = arr.some(v => (typeof v === "string" ? v === value : v.id === value));
   if (alreadyExists) return;
-
   arr.push({ id: value, label });
-
   updateSelectedVariablesUI();
 }
 
@@ -295,6 +294,7 @@ function clearSelections() {
 
   const stateRadio = document.querySelector('input[name="geo_level"][value="state"]');
   const countyRadio = document.querySelector('input[name="geo_level"][value="county"]');
+
   if (stateRadio) stateRadio.checked = true;
   if (countyRadio) countyRadio.checked = false;
 
@@ -313,11 +313,9 @@ function clearSelections() {
   if (previewTableBody) previewTableBody.innerHTML = "";
   if (extractorMessages) extractorMessages.textContent = "";
   updateSelectedVariablesUI();
+  clearPreview();
 }
 
-function performExtraction(){
-
-}
 
 
 //Load variable lists from server
@@ -327,13 +325,11 @@ async function loadVariables() {
     if (!response.ok) {
       throw new Error("Failed to load variables");
     }
-
     const data = await response.json();
     console.log("Loaded variable lists:", data);
     populateSelect(countyVariable, data.county_variables || []);
     populateSelect(stateVariable, data.state_variables || []);
     populateSelect(censusVariable, data.census_variables || []);
-
   } catch (err) {
     console.error(err);
     extractorMessages.textContent = "Error loading variable lists.";
@@ -341,39 +337,41 @@ async function loadVariables() {
 }
 
 
-//EXTRACTION
-function renderTable(targetId, rows) {
-  console.log("Rendering table with rows:", rows);
-  const target = document.getElementById(targetId);
 
-  if (!rows || rows.length === 0) {
-    target.innerHTML = "<p>No results.</p>";
-    return;
+//PREVIEW TABLE
+function showPreview(rows) {
+  if (!rows || rows.length === 0) return;
+  document.getElementById("preview-placeholder").style.display = "none";
+  const previewRows = rows.slice(0, 30);
+  const columns = Object.keys(rows[0]).slice(0, 6).map((key) => ({
+    title: key,
+    field: key,
+    headerSort: true,
+    minWidth: 160,
+    tooltip: true,
+  }));
+  previewTabulator = new Tabulator("#preview-grid", {
+    data: previewRows,
+    columns,
+    layout: "fitDataTable",     // stretches columns to fill width (nice preview feel)
+    responsiveLayout: "collapse", // hides overflow columns into a dropdown/row area
+    pagination: "local",
+    paginationSize: 10,
+  });
+}
+
+function clearPreview() {
+  if (previewTabulator) {
+    previewTabulator.destroy();
+    previewTabulator = null;
   }
-
-  const columns = Object.keys(rows[0]);
-
-  let html = "<table border='1' cellpadding='6' cellspacing='0'>";
-  html += "<thead><tr>";
-  for (const col of columns) {
-    html += `<th>${col}</th>`;
-  }
-  html += "</tr></thead><tbody>";
-
-  for (const row of rows) {
-    html += "<tr>";
-    for (const col of columns) {
-      const val = row[col];
-      html += `<td>${val === null || val === undefined ? "" : val}</td>`;
-    }
-    html += "</tr>";
-  }
-
-  html += "</tbody></table>";
-  target.innerHTML = html;
+  document.getElementById("preview-grid").innerHTML = "";
+  document.getElementById("preview-placeholder").style.display = "block";
 }
 
 
+
+//EXTRACTION
 function validateExtractionState(varsObj) {
   const errors = [];
   const totalVars = countSelectedVars(varsObj);
@@ -402,7 +400,7 @@ function validateExtractionState(varsObj) {
   };
 }
 
-async function performExtraction() {
+async function performExtraction(Type) {
   syncGeoFromInputs();
   const result = validateExtractionState(selectedVariables);
 
@@ -414,7 +412,6 @@ async function performExtraction() {
     `;
     return;
   }
-
   extractorMessages.textContent = "";
   const payload = structuredClone(selectedVariables);
   console.log("Sending extraction payload:", payload);
@@ -425,29 +422,74 @@ async function performExtraction() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
-
     if (!res.ok) {
       throw new Error(`Extraction failed (${res.status})`);
     }
-
     const data = await res.json();
     console.log("Extraction result:", data);
-    renderTable("preview-table", data.data);
 
-    
-    // Do whatever your backend returns: preview rows, download link, etc.
-    // Example:
+    if (Type == "preview") {
+      showPreview(data.data);
+    }
+    if (Type == "CSV") {
+      downloadCSVFromObjects(data.data)
+    }
     extractorMessages.textContent = "Extraction completed successfully.";
-
-    // If you return preview rows:
-    // renderPreviewTable(data.rows);
-
   } catch (err) {
     console.error(err);
     extractorMessages.textContent = "Extraction failed. Check console for details.";
   }
+}
 
-  console.log("Extraction result:", data);
+
+
+//DOWNLOADS
+function downloadCSVFromObjects(rows, filename = "export.csv") {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error("rows must be a non-empty array");
+  }
+  const headerSet = new Set();
+  for (const r of rows) Object.keys(r || {}).forEach(k => headerSet.add(k));
+  const headers = Array.from(headerSet);
+  const escapeCell = (value) => {
+    if (value === null || value === undefined) return "";
+    const s = String(value);
+    
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+  const csvLines = [];
+  csvLines.push(headers.map(escapeCell).join(","));
+  for (const r of rows) {
+    const line = headers.map(h => escapeCell(r?.[h]));
+    csvLines.push(line.join(","));
+  }
+  const csv = csvLines.join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadJSONFromObjects(rows, filename = "export.json") {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    throw new Error("rows must be a non-empty array");
+  }
+  const json = JSON.stringify(rows, null, 2); // pretty-printed JSON
+  const blob = new Blob([json], { type: "application/json;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 
@@ -485,8 +527,9 @@ function initExtractorUI() {
 
   clearButton.addEventListener("click", clearSelections);
 
-  previewButton.addEventListener("click", performExtraction);
-
+  previewButton.addEventListener("click", () => performExtraction("preview"));
+  exportCsvButton.addEventListener("click", () => performExtraction("CSV"));
+  exportJsonButton.addEventListener("click", () => performExtraction("JSON"));
   
   loadVariables();
   wireAddVariableButtons();
