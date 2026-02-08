@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>More-info popups</title>
+  <style>
+    .info-wrap { display: inline-block; position: relative; }
+
+    .info-btn {
+      cursor: pointer;
+      padding: 6px 10px;
+      border: 1px solid #ccc;
+      background: #fff;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .popover {
+      position: absolute;
+      z-index: 1000;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 240px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      display: none;
+    }
+
+    .popover[data-open="true"] { display: block; }
+
+    .popover .title { font-weight: 600; margin-bottom: 6px; }
+    .popover .close {
+      float: right;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* little arrow */
+    .popover::before {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      border-width: 0 8px 8px 8px;
+      border-style: solid;
+      border-color: transparent transparent #ddd transparent;
+    }
+    .popover::after {
+      content: "";
+      position: absolute;
+      top: -7px;
+      left: 12px;
+      border-width: 0 8px 8px 8px;
+      border-style: solid;
+      border-color: transparent transparent #fff transparent;
+    }
+
+    /* demo layout */
+    .row { margin: 18px 0; }
+  </style>
+</head>
+<body>
+
+  <div class="row">
+    Registration fee
+    <span class="info-wrap">
+      <button class="info-btn" type="button"
+        aria-expanded="false"
+        aria-controls="pop-1">
+        More info
+      </button>
+
+      <div class="popover" id="pop-1" role="dialog" aria-label="Registration fee info">
+        <button class="close" type="button" aria-label="Close">&times;</button>
+        <div class="title">Registration fee</div>
+        <div>This covers materials and your event badge.</div>
+      </div>
+    </span>
+  </div>
+
+  <div class="row">
+    Data sources
+    <span class="info-wrap">
+      <button class="info-btn" type="button"
+        aria-expanded="false"
+        aria-controls="pop-2">
+        More info
+      </button>
+
+      <div class="popover" id="pop-2" role="dialog" aria-label="Data sources info">
+        <button class="close" type="button" aria-label="Close">&times;</button>
+        <div class="title">Data sources</div>
+        <div>We use ACS estimates and county survey responses updated monthly.</div>
+      </div>
+    </span>
+  </div>
+
+  <script>
+    // helper: close all popovers
+    function closeAll() {
+      document.querySelectorAll(".popover").forEach(pop => pop.dataset.open = "false");
+      document.querySelectorAll(".info-btn").forEach(btn => btn.setAttribute("aria-expanded", "false"));
+    }
+
+    // toggle on button click
+    document.querySelectorAll(".info-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const pop = document.getElementById(btn.getAttribute("aria-controls"));
+        const isOpen = pop.dataset.open === "true";
+
+        closeAll();
+
+        if (!isOpen) {
+          pop.dataset.open = "true";
+          btn.setAttribute("aria-expanded", "true");
+        }
+      });
+    });
+
+    // close button inside popover
+    document.querySelectorAll(".popover .close").forEach(closeBtn => {
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        closeAll();
+      });
+    });
+
+    // click outside closes
+    document.addEventListener("click", () => closeAll());
+
+    // Esc closes
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeAll();
+    });
+  </script>
+</body>
+</html>

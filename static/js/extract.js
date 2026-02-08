@@ -46,6 +46,83 @@ const extractorMessages = document.getElementById("extractor-messages");
 //Preview Table
 let previewTabulator = null;
 
+//Info Popup
+let activePopup = null;
+const infoText = {
+  "export-level": `
+    <ul class="info-list">
+      <li>Data will be returned in one county per row format.</li>
+      <li>Choose <strong>State</strong> to export all counties within the selected state.</li>
+      <li>Choose <strong>County</strong> to export only the specified county.</li>
+    </ul>
+  `,
+  "multi-export": `
+    <div>
+      <p style="margin:0 0 6px 0;">
+        To export multiple states or counties, separate entries using commas.
+      </p>
+      <p style="margin:0;">
+        <em>Example:</em><br>
+        <code>MD, VA, PA</code><br>
+        <code>24005, 24003, 24510</code>
+      </p>
+    </div>
+  `,
+  "move-score": `
+    <div>
+      <p style="margin:0 0 8px 0;">
+        The MoVE (Measurement of Voting Equity) score is a composite score that summarizes various factors related to voting access and equity at the county level.
+      </p>
+      <p style="margin:0;">
+        <a href="#" target="_blank" rel="noopener">
+          Learn more about the MoVE methodology
+        </a>
+      </p>
+    </div>
+    `,
+  "county-vars": `
+    <div>
+      <p style="margin:0 0 8px 0;">
+        County MoVE variables consist of various metrics related to voting access and equity at the county level.
+      </p>
+      <p style="margin:0;">
+        <a href="#" target="_blank" rel="noopener">
+          Learn more about the MoVE variables
+        </a>
+      </p>
+    </div>
+    `,
+  "state-vars": `
+    <div>
+      <p style="margin:0 0 8px 0;">
+        State MoVE variables consist of various metrics related to voting access and equity at the state level.
+      </p>
+
+      <p style="margin:0 0 6px 0;">
+        <a href="#" target="_blank" rel="noopener">
+          Learn more about the MoVE variables
+        </a>
+      </p>
+
+      <p style="margin:0; font-size:0.75rem; color:var(--muted);">
+        If you export multiple counties within the same state, the state-level variables will be duplicated across those counties since they are the same for all counties in a state.
+      </p>
+    </div>
+  `,
+  "census-vars": `
+    <div>
+      <p style="margin:0 0 8px 0;">
+        Various U.S. Census ACS county-level variables.
+      </p>
+      <p style="margin:0;">
+        <a href="#" target="_blank" rel="noopener">
+          Visit the Census Bureau's ACS website
+        </a>
+      </p>
+    </div>
+  `
+};
+
 //Helper Functions
 function parseCsvList(raw) {
   return raw
@@ -286,7 +363,7 @@ function clearSelections() {
   selectedVariables.geography.level = "state";
   selectedVariables.geography.states = [];
   selectedVariables.geography.counties = [];
-  selectedVariables.includeMoveScore = false;
+  selectedVariables.includeMoveScore = true;
 
   selectedVariables.variables.county = [];
   selectedVariables.variables.state = [];
@@ -303,11 +380,11 @@ function clearSelections() {
   stateInput.disabled = false;
   countyInput.disabled = true; 
 
-  includeMoveCheckbox.checked = false;
+  includeMoveCheckbox.checked = true;
 
-  if (countyVariable) countyVariable.value = "";
-  if (stateVariable) stateVariable.value = "";
-  if (censusVariable) censusVariable.value = "";
+  // if (countyVariable) countyVariable.value = "";
+  // if (stateVariable) stateVariable.value = "";
+  // if (censusVariable) censusVariable.value = "";
 
   if (previewTableHead) previewTableHead.innerHTML = "";
   if (previewTableBody) previewTableBody.innerHTML = "";
@@ -525,19 +602,58 @@ function initExtractorUI() {
     removeSelectedVariable(varTypeKey, idToRemove);
   });
 
-  clearButton.addEventListener("click", clearSelections);
+    document.querySelectorAll(".info-btn").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      if (activePopup) {
+        activePopup.remove();
+        activePopup = null;
+      }
+      const popup = document.createElement("div");
+      popup.className = "info-popup";
+      popup.innerHTML = infoText[btn.dataset.info] || "No description available.";
+      btn.style.position = "relative";
+      btn.appendChild(popup);
+      activePopup = popup;
+    });
+  });
 
-  previewButton.addEventListener("click", () => performExtraction("preview"));
-  exportCsvButton.addEventListener("click", () => performExtraction("CSV"));
-  exportJsonButton.addEventListener("click", () => performExtraction("JSON"));
-  
-  loadVariables();
-  wireAddVariableButtons();
-  handleGeoLevelChange();
-  syncAllFromUI();
-  updateSelectedVariablesUI();
+  document.addEventListener("click", () => {
+    if (activePopup) {
+      activePopup.remove();
+      activePopup = null;
+    }
+  });
 
-  console.log("Initialized selectedVariables:", selectedVariables);
+  document.querySelectorAll(".var-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.target;
+        document.querySelectorAll(".var-tab").forEach(t =>
+          t.classList.remove("active")
+        );
+        tab.classList.add("active");
+        document.querySelectorAll(".var-panel").forEach(panel => {
+          panel.classList.toggle(
+            "active",
+            panel.dataset.vartype === target
+          );
+        });
+      });
+    });
+
+    clearButton.addEventListener("click", clearSelections);
+
+    previewButton.addEventListener("click", () => performExtraction("preview"));
+    exportCsvButton.addEventListener("click", () => performExtraction("CSV"));
+    exportJsonButton.addEventListener("click", () => performExtraction("JSON"));
+    
+    loadVariables();
+    wireAddVariableButtons();
+    handleGeoLevelChange();
+    syncAllFromUI();
+    updateSelectedVariablesUI();
+
+    console.log("Initialized selectedVariables:", selectedVariables);
 }
 
 initExtractorUI();
