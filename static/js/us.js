@@ -1,12 +1,13 @@
 /////HELPER FUNCTIONS FOR US VIEW/////
 function getColor(score) {
-  return score > 80 ? "#1a9850" :   // dark green (very good)
-         score > 60 ? "#66bd63" :   // light green
-         score > 40 ? "#4575b4" :   // blue (middle)
-         score > 20 ? "#f46d43" :   // light red / orange
-                      "#d73027";    // dark red (very bad)
+  return score >= 90 ? "#1a9850" :   // green (90+)
+         score >= 80 ? "#66bd63" :   // light green (80–89.9)
+         score >= 70 ? "#4575b4" :   // blue (70–79.9)
+         score >= 60 ? "#fdae61" :   // light orange (60–69.9)
+         score >= 50 ? "#f46d43" :   // dark orange (50–59.9)
+         score >= 40 ? "#d73027" :   // red (40–49.9)
+                      "#7f0000";    // dark red (≤39.9)
 }
-
 
 
 /////STYLE & LEGEND FUNCTIONS////
@@ -26,7 +27,7 @@ function addScoreLegend() {
     div.style.boxShadow = "0 2px 8px rgba(0,0,0,0.25)";
     div.style.fontSize = "14px";
     div.style.lineHeight = "18px";
-    div.style.minWidth = "120px";
+    div.style.minWidth = "140px";
 
     div.innerHTML = `
       <div style="font-size:16px; font-weight:700; margin-bottom:8px;">
@@ -34,37 +35,46 @@ function addScoreLegend() {
       </div>
 
       <div style="display:flex; align-items:center; margin-bottom:6px;">
-        <span style="background:${getColor(81)}; width:16px; height:16px; margin-right:8px;"></span>
-        81–100
+        <span style="background:${getColor(95)}; width:16px; height:16px; margin-right:8px;"></span>
+        90–100
       </div>
 
       <div style="display:flex; align-items:center; margin-bottom:6px;">
-        <span style="background:${getColor(61)}; width:16px; height:16px; margin-right:8px;"></span>
-        61–80
+        <span style="background:${getColor(85)}; width:16px; height:16px; margin-right:8px;"></span>
+        80–89.9
       </div>
 
       <div style="display:flex; align-items:center; margin-bottom:6px;">
-        <span style="background:${getColor(41)}; width:16px; height:16px; margin-right:8px;"></span>
-        41–60
+        <span style="background:${getColor(75)}; width:16px; height:16px; margin-right:8px;"></span>
+        70–79.9
       </div>
 
       <div style="display:flex; align-items:center; margin-bottom:6px;">
-        <span style="background:${getColor(21)}; width:16px; height:16px; margin-right:8px;"></span>
-        21–40
+        <span style="background:${getColor(65)}; width:16px; height:16px; margin-right:8px;"></span>
+        60–69.9
+      </div>
+
+      <div style="display:flex; align-items:center; margin-bottom:6px;">
+        <span style="background:${getColor(55)}; width:16px; height:16px; margin-right:8px;"></span>
+        50–59.9
+      </div>
+
+      <div style="display:flex; align-items:center; margin-bottom:6px;">
+        <span style="background:${getColor(45)}; width:16px; height:16px; margin-right:8px;"></span>
+        40–49.9
       </div>
 
       <div style="display:flex; align-items:center;">
-        <span style="background:${getColor(0)}; width:16px; height:16px; margin-right:8px;"></span>
-        0–20
+        <span style="background:${getColor(20)}; width:16px; height:16px; margin-right:8px;"></span>
+        ≤ 39.9
       </div>
     `;
-
     return div;
   };
-
   legend.addTo(App.map);
   App.legendControl = legend;
 }
+
 
 
 function showUSSidebar() {
