@@ -71,6 +71,13 @@ def extract(request: Request):
         {"request": request}
     )
 
+@app.get("/variables")
+def variables(request: Request):
+    return templates.TemplateResponse(
+        "variables.html",
+        {"request": request}
+    )
+
 @app.get("/all-variables")
 def get_all_variables():
    variables = get_variable_lists()

@@ -24,12 +24,43 @@
   </header>
 
   <main class="container">
-    <section class="intro">
-      <p>
-        The Measurement of Voting Equity (MoVE) project provides an academic framework
-        for evaluating voting equity across U.S. states and counties. This portal
-        supports interactive exploration and research-oriented data access.
-      </p>
+    <section class="move-intro">
+
+      <div class="move-mission">
+        <h3>Project Mission</h3>
+        <p>
+         The Measurement of Voting Equity (MoVE) project seeks to identify barriers to voting at the local level and 
+         understand how those barriers affect participation in our democracy. By examining county-level election systems, 
+         we work to measure and highlight differences in voter access across communities. Helping to ensure every eligible voter has an equal opportunity to participate in our democracy is the core mission of this project.
+        </p>
+      </div>
+
+      <div class="move-overview">
+        <div class="move-card">
+          <h4>County-Level Variables</h4>
+          <p>
+            Variables are meticulously collected through direct communication with election 
+            officials, public records, policy documentation, and publicly available sources.
+          </p>
+        </div>
+
+        <div class="move-card">
+          <h4>Composite MoVE Index</h4>
+          <p>
+            County-level measures contribute to a standardized MoVE Index score, allowing 
+            for comparative evaluation of election systems across jurisdictions.
+          </p>
+        </div>
+
+        <div class="move-card">
+          <h4>Interactive Research Access</h4>
+          <p>
+            The dashboard and data extractor provide structured access to detailed 
+            state- and county-level information for academic and policy research.
+          </p>
+        </div>
+      </div>
+
     </section>
 
     <section class="dashboard-section" id="dashboard-section">
@@ -42,6 +73,9 @@
           </button>
           <button class="tab-button" id="extract-tab" type="button">
             Data Extraction
+          </button>
+          <button class ="tab-button" id = "view-variables-tab" type="button">
+            Variable Information
           </button>
         </div>
       </div>
@@ -89,6 +123,15 @@
           style="width: 100%; height: 700px; border: none;"
         ></iframe>
       </div>
+
+      <!-- VIEW VARIABLES VIEW (toggle this) -->
+      <div id="view-variables-view" class="is-hidden">
+        <iframe
+          title="MoVE Variable Information"
+          src="/variables"
+          style="width: 100%; height: 700px; border: none;"
+        ></iframe>
+      </div>
     </section>
   </main>
 
@@ -108,20 +151,25 @@
     (function () {
       const mapTab = document.getElementById("map-tab");
       const extractTab = document.getElementById("extract-tab");
+      const viewVariablesTab = document.getElementById("view-variables-tab");
 
       const mapView = document.getElementById("map-view");
       const extractView = document.getElementById("extract-view");
+      const viewVariablesView = document.getElementById("view-variables-view");
+
       const mapControls = document.getElementById("map-controls");
 
       function showMap() {
         mapView.classList.remove("is-hidden");
         extractView.classList.add("is-hidden");
+        viewVariablesView.classList.add("is-hidden");
+
         mapControls.classList.remove("is-hidden");
 
         mapTab.classList.add("is-active");
         extractTab.classList.remove("is-active");
+        viewVariablesTab.classList.remove("is-active");
 
-        // Leaflet needs a resize refresh after being re-shown
         if (window.map && typeof window.map.invalidateSize === "function") {
           setTimeout(() => window.map.invalidateSize(), 50);
         }
@@ -130,18 +178,33 @@
       function showExtract() {
         mapView.classList.add("is-hidden");
         extractView.classList.remove("is-hidden");
+        viewVariablesView.classList.add("is-hidden");
+
         mapControls.classList.add("is-hidden");
 
         extractTab.classList.add("is-active");
         mapTab.classList.remove("is-active");
+        viewVariablesTab.classList.remove("is-active");
       }
 
+      function showVariables() {
+        mapView.classList.add("is-hidden");
+        extractView.classList.add("is-hidden");
+        viewVariablesView.classList.remove("is-hidden");
+
+        mapControls.classList.add("is-hidden");
+
+        viewVariablesTab.classList.add("is-active");
+        mapTab.classList.remove("is-active");
+        extractTab.classList.remove("is-active");
+      }
       mapTab.addEventListener("click", showMap);
       extractTab.addEventListener("click", showExtract);
-
+      viewVariablesTab.addEventListener("click", showVariables);
       // default
       showMap();
     })();
+
   </script>
 </body>
 </html>

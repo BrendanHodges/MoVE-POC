@@ -174,7 +174,6 @@ function handleStateClick(feature, layer) {
 function stateStyle(feature) {
     const stateFP = feature.properties.STATEFP;
     const score = App.getStateScore(stateFP);
-
     return {
       fillColor: score != null ? getColor(score) : "#ccc",
       weight: 1,
