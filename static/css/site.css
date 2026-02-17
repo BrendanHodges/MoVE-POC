@@ -4,6 +4,8 @@
   --muted: #555;
   --accent: #003049;
   --bg: #ffffff;
+  --navy: #0b2545;
+  --navy-soft: #f3f6fb;
 }
 
 * {
@@ -457,6 +459,27 @@ main.container{
   .move-overview{
     grid-template-columns: 1fr;
   }
+}
+
+.move-mission{
+  max-width: 900px;
+  margin: 0 auto 36px;
+  padding: 22px 24px;
+  background: var(--navy-soft);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--navy);
+  border-radius: var(--card-radius);
+}
+
+.move-mission h3{
+  margin: 0 0 10px 0;
+  color: var(--navy);
+}
+
+.move-mission p{
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 

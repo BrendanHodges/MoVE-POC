@@ -83,6 +83,8 @@ def get_all_variables():
    variables = get_variable_lists()
    return variables
 
+
+
 @app.post("/data-extract")
 def data_extract(variables: dict):
     level = variables["geography"]["level"]
@@ -110,3 +112,7 @@ def data_extract(variables: dict):
         "rows": len(df),
         "data": data
     }
+
+@app.get("/methods", response_class=HTMLResponse)
+async def methods(request: Request):
+    return templates.TemplateResponse("methods.html", {"request": request})
