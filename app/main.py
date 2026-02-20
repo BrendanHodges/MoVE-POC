@@ -116,3 +116,7 @@ def data_extract(variables: dict):
 @app.get("/methods", response_class=HTMLResponse)
 async def methods(request: Request):
     return templates.TemplateResponse("methods.html", {"request": request})
+
+@app.get("/about", response_class=HTMLResponse)
+async def about_us(request: Request):
+    return templates.TemplateResponse("aboutus.html", {"request": request})

@@ -74,7 +74,7 @@ const infoText = {
         The MoVE (Measurement of Voting Equity) score is a composite score that summarizes various factors related to voting access and equity at the county level.
       </p>
       <p style="margin:0;">
-        <a href="#" target="_blank" rel="noopener">
+        <a href="/methods" target="_blank" rel="noopener">
           Learn more about the MoVE methodology
         </a>
       </p>
@@ -86,7 +86,7 @@ const infoText = {
         County MoVE variables consist of various metrics related to voting access and equity at the county level.
       </p>
       <p style="margin:0;">
-        <a href="#" target="_blank" rel="noopener">
+        <a href="/variables" target="_blank" rel="noopener">
           Learn more about the MoVE variables
         </a>
       </p>
@@ -602,7 +602,7 @@ function initExtractorUI() {
     removeSelectedVariable(varTypeKey, idToRemove);
   });
 
-    document.querySelectorAll(".info-btn").forEach(btn => {
+  document.querySelectorAll(".info-btn").forEach(btn => {
     btn.addEventListener("click", e => {
       e.stopPropagation();
       if (activePopup) {
