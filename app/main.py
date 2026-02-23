@@ -120,3 +120,7 @@ async def methods(request: Request):
 @app.get("/about", response_class=HTMLResponse)
 async def about_us(request: Request):
     return templates.TemplateResponse("aboutus.html", {"request": request})
+
+@app.get("/publications", response_class=HTMLResponse)
+async def publications(request: Request):
+    return templates.TemplateResponse("publications.html", {"request": request})
