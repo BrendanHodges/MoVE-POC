@@ -1,45 +1,10 @@
 /////HELPER FUNCTIONS FOR US VIEW/////
+/////HELPER FUNCTIONS FOR US VIEW/////
 function clamp(n, min, max) {
   return Math.max(min, Math.min(max, n));
 }
 
-function lerp(a, b, t) {
-  return a + (b - a) * t;
-}
-
-function rgbToHex(r, g, b) {
-  const toHex = (x) => Math.round(x).toString(16).padStart(2, "0");
-  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
-}
-
-// 0 -> red (#d73027), 50 -> yellow (#ffffbf), 100 -> green (#1a9850)
-function getColor(score) {
-  const s = clamp(score, 0, 100);
-  const red =   { r: 215, g: 48,  b: 39  };  // #d73027
-  const yellow ={ r: 255, g: 255, b: 191 };  // #ffffbf
-  const green = { r: 26,  g: 152, b: 80  };  // #1a9850
-
-  if (s <= 50) {
-    const t = s / 50; // 0..1 from red to yellow
-    return rgbToHex(
-      lerp(red.r, yellow.r, t),
-      lerp(red.g, yellow.g, t),
-      lerp(red.b, yellow.b, t)
-    );
-  } else {
-    const t = (s - 50) / 50; // 0..1 from yellow to green
-    return rgbToHex(
-      lerp(yellow.r, green.r, t),
-      lerp(yellow.g, green.g, t),
-      lerp(yellow.b, green.b, t)
-    );
-  }
-}function clamp(n, min, max) {
-  return Math.max(min, Math.min(max, n));
-}
-
 function hslToHex(h, s, l) {
-  // h: 0-360, s/l: 0-1
   const c = (1 - Math.abs(2 * l - 1)) * s;
   const hp = h / 60;
   const x = c * (1 - Math.abs((hp % 2) - 1));
@@ -61,9 +26,13 @@ function hslToHex(h, s, l) {
 }
 
 function getColor(score) {
-  const s = clamp(score, 0, 100);
-  const hue = (s / 100) * 120; // 0=red, 120=green
-  return hslToHex(hue, 0.75, 0.45); // tweak s/l if you want
+  const s = clamp(score, 0, 100) / 100;
+
+  // Curve: makes low/mid values stay warmer longer, green appears later
+  const t = Math.pow(s, 1.6); // increase to 1.8/2.0 if you want even less green
+
+  const hue = t * 120; // 0=red, 120=green
+  return hslToHex(hue, 0.80, 0.42); // slightly lower lightness helps avoid “fresh green”
 }
 
 /////STYLE & LEGEND FUNCTIONS////

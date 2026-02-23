@@ -62,6 +62,20 @@ def fetch_move_equation_scores():
 
         df_wide.columns.name = None
         return df_wide
+    
+    def fix_post_office(df: pd.DataFrame) -> pd.DataFrame:
+
+        reverse_col = ['Local Post Office']
+
+        for col in reverse_col:
+            if col in df.columns:
+                col_min = df[col].min()
+                col_max = df[col].max()
+                if col_max != col_min:
+                    df[col] = col_max - df[col]  # equivalent to (col_max + col_min) - df[col] if you want symmetry
+                else:
+                    df[col] = 0
+        return df
 
 
     def score(df_final: pd.DataFrame) -> pd.DataFrame:
@@ -114,8 +128,11 @@ def fetch_move_equation_scores():
     #Sum the questions for every MoVE variable
     df_cat_wide = build_category_scores(df_raw)
 
+    #Reverse Polling place score
+    df_post_office_fixed = fix_post_office(df_cat_wide)
+
     # Score and export (MoVE equation)
-    df_scored = score(df_cat_wide)
+    df_scored = score(df_post_office_fixed)
 
     df_scored = df_scored[['county_id', 'county_name', 'state_id', 'move_score_0_100']]
 
@@ -219,7 +236,6 @@ def get_state_ids_from_abbrevs(state_abbrevs: List[str]) -> List[str]:
 
 
 def extraction(level: str, locations: list, variables: dict) -> pd.DataFrame:
-
     def extract_census_data(level, geography, census_variables) -> pd.DataFrame:
         if not census_variables:
             raise ValueError("Provide at least one census variable name.")
