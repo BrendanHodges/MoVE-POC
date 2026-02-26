@@ -43,6 +43,8 @@ const previewTableBody = previewTable.querySelector("tbody");
 //Messages
 const extractorMessages = document.getElementById("extractor-messages");
 
+const selectedVarsEl = document.getElementById("selected-variables");
+
 //Preview Table
 let previewTabulator = null;
 
@@ -151,7 +153,9 @@ function renderPills(items, varTypeKey = null) {
       ? item
       : (item.label ?? item.id ?? JSON.stringify(item));
 
-    const removeBtn = varTypeKey ? `
+    const isVarPill = !!varTypeKey;
+
+    const removeBtn = isVarPill ? `
       <button type="button"
         class="remove-pill-btn"
         data-vartype="${escapeHtml(varTypeKey)}"
@@ -170,16 +174,21 @@ function renderPills(items, varTypeKey = null) {
     ` : "";
 
     return `
-      <span style="
-        display:inline-flex;
-        align-items:center;
-        padding:4px 8px;
-        border:1px solid var(--border);
-        border-radius:999px;
-        font-size:0.85rem;
-        margin:3px 6px 0 0;
-        background: var(--panel, transparent);
-      ">
+      <span
+        class="pill ${isVarPill ? "var-pill" : ""}"
+        ${isVarPill ? `data-id="${escapeHtml(id)}" data-vartype="${escapeHtml(varTypeKey)}"` : ""}
+        style="
+          display:inline-flex;
+          align-items:center;
+          padding:4px 8px;
+          border:1px solid var(--border);
+          border-radius:999px;
+          font-size:0.85rem;
+          margin:3px 6px 0 0;
+          background: var(--panel, transparent);
+          ${isVarPill ? "cursor:pointer;" : ""}
+        "
+      >
         ${escapeHtml(label)}
         ${removeBtn}
       </span>
@@ -452,13 +461,10 @@ function clearPreview() {
 function validateExtractionState(varsObj) {
   const errors = [];
   const totalVars = countSelectedVars(varsObj);
-
   if (totalVars < 1) {
     errors.push("Select at least one variable before extracting.");
   }
-
   const level = varsObj.geography.level;
-
   if (level === "county") {
     if (!Array.isArray(varsObj.geography.counties) || varsObj.geography.counties.length < 1) {
       errors.push("Enter at least one county ID (comma-separated) for county-level export.");
@@ -597,7 +603,7 @@ function initExtractorUI() {
   selectedVariablesContainer.addEventListener("click", (e) => {
     const btn = e.target.closest(".remove-pill-btn");
     if (!btn) return;
-    const varTypeKey = btn.dataset.vartype; // "varType1"
+    const varTypeKey = btn.dataset.vartype;
     const idToRemove = btn.dataset.id;
     removeSelectedVariable(varTypeKey, idToRemove);
   });
@@ -639,6 +645,19 @@ function initExtractorUI() {
           );
         });
       });
+    });
+
+    selectedVarsEl.addEventListener("click", (e) => {
+      if (e.target.classList.contains("remove-pill-btn")) {
+        e.stopPropagation();
+        return;
+      }
+
+      const pill = e.target.closest(".var-pill");
+      if (!pill) return;
+
+      const id = pill.dataset.id;
+      window.parent.postMessage({ type: "JUMP_TO_VAR", id }, window.location.origin);
     });
 
     clearButton.addEventListener("click", clearSelections);

@@ -46,7 +46,7 @@
                     </thead>
 
                     <tbody>
-                        <tr>
+                        <tr data-id = "Registration Info">
                         <td>Registration Information (0–5)</td>
                         <td>
                             Additive scale measuring whether the county provides registration information to the general public 
@@ -54,7 +54,7 @@
                             minority-oriented media services, and in minority languages.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Voting Info">
                         <td>Voting Information (0–5)</td>
                         <td>
                             Additive scale measuring whether the county provides voting information to the general public 
@@ -62,7 +62,7 @@
                             minority-oriented media services, and in minority languages.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Registered Voter Info">
                         <td>Registered Voter Information (0–4)</td>
                         <td>
                             Additive scale measuring whether the county provides the following information to registered voters: 
@@ -70,14 +70,14 @@
                             and voting center locations and updates.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Registration Drive">
                         <td>Registration Drives (0,1)</td>
                         <td>
                             Dichotomous measure indicating whether the county held a voter registration drive in the past four years. 
                             0 = no registration drive, 1 = registration drive.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Ease of Registration">
                         <td>Ease of Registration (0–6)</td>
                         <td>
                             Additive scale measuring whether the county facilitates registration by: not requiring government-issued 
@@ -85,42 +85,42 @@
                             offices, assisting incomplete forms, not requiring notarization, and providing assistance in minority languages.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "pollworkers">
                         <td>Availability of Poll Workers (0–6)</td>
                         <td>
                             Additive scale measuring poll worker availability, including: no shortages, adequate funding, 
                             recent training, demographic representation, assistance for limited English voters, and media recruitment campaigns.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Election Day Polling Locations">
                         <td>Reduction in Election Day Polling Locations (0,1)</td>
                         <td>
                             Dichotomous measure indicating whether the county reduced Election Day polling locations in the past four years. 
                             0 = no reduction, 1 = reduction.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Drop Box Score">
                         <td>Drop Boxes (0,1)</td>
                         <td>
                             Dichotomous variable indicating whether the county provides drop boxes for voting. 
                             0 = no drop boxes, 1 = drop boxes available.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Vote Center Score">
                         <td>Vote Center (0,1)</td>
                         <td>
                             Dichotomous variable indicating whether the county has at least one vote center. 
                             0 = no vote centers, 1 = at least one vote center.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Standard Mail">
                         <td>Standard Mail Service (0,1)</td>
                         <td>
                             Dichotomous variable measuring whether the entire county has standard residential mail delivery. 
                             1 = full residential mail service, 0 = some residents lack residential mail delivery.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Local Post Office">
                         <td>Post Office Locations (0–5)</td>
                         <td>
                             Likert scale measure of access to post offices. 
@@ -128,14 +128,14 @@
                             2 = up to 60 miles; 1 = up to 80 miles; 0 = more than 80 miles.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "State Support">
                         <td>State Support for Elections (0–3)</td>
                         <td>
                             Likert scale measure of financial support provided by the state for elections. 
                             0 = no support; 1 = limited funding; 2 = partial funding for all elections; 3 = full funding for all elections.
                         </td>
                         </tr>
-                        <tr>
+                        <tr data-id = "Technology State Funding">
                         <td>State Support for Equipment (0,1)</td>
                         <td>
                             Dichotomous variable measuring whether the state provides funding for election equipment. 
@@ -143,11 +143,28 @@
                         </td>
                         </tr>
                     </tbody>
-
-
                 </table>
             </div>
         </section>
     </main>
+
+    <script src="/static/js/extract.js"></script>
+    <script>
+        window.addEventListener("message", (event) => {
+            if (event.origin !== window.location.origin) return;
+
+            const msg = event.data;
+            if (!msg || msg.type !== "HIGHLIGHT_VAR_ROW") return;
+
+            const id = msg.id;
+
+            const row = document.querySelector(`tr[data-id="${CSS.escape(id)}"]`);
+            if (!row) return;
+
+            row.scrollIntoView({ behavior: "smooth", block: "center" });
+            row.classList.add("row-highlight");
+            setTimeout(() => row.classList.remove("row-highlight"), 1200);
+            });
+    </script>
 </body>
 </html>

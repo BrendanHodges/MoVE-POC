@@ -257,6 +257,24 @@
         }
       });
 
+      const variablesIframe = document.getElementById("view-variables-view");
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== window.location.origin) return;
+
+        const msg = event.data;
+        if (!msg || msg.type !== "JUMP_TO_VAR") return;
+
+        // 1) switch UI to variables view (your existing tab logic)
+        showVariables(); // <- whatever you use to reveal the variables iframe
+
+        // 2) forward message to the variables iframe
+        variablesIframe.contentWindow.postMessage(
+          { type: "HIGHLIGHT_VAR_ROW", id: msg.id },
+          window.location.origin
+        );
+      });
+
     })();
 
   </script>
