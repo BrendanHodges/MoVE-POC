@@ -150,6 +150,8 @@
 
     <script src="/static/js/extract.js"></script>
     <script>
+        window.parent.postMessage({ type: "VARIABLES_READY" }, window.location.origin);
+
         window.addEventListener("message", (event) => {
             if (event.origin !== window.location.origin) return;
 
@@ -159,12 +161,15 @@
             const id = msg.id;
 
             const row = document.querySelector(`tr[data-id="${CSS.escape(id)}"]`);
-            if (!row) return;
+            if (!row) {
+            console.warn("Row not found for id:", id);
+            return;
+            }
 
             row.scrollIntoView({ behavior: "smooth", block: "center" });
             row.classList.add("row-highlight");
-            setTimeout(() => row.classList.remove("row-highlight"), 1200);
-            });
+            setTimeout(() => row.classList.remove("row-highlight"), 5500);
+        });
     </script>
 </body>
 </html>

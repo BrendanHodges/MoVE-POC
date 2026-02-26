@@ -482,11 +482,15 @@ main.container{
   line-height: 1.6;
 }
 
-.row-highlight {
-  background-color: rgba(255, 235, 59, 0.3);
-  transition: background-color 0.6s ease;
+.variables-table tr.row-highlight > td,
+.variables-table tr.row-highlight > th {
+  background-color: rgba(255, 235, 59, 0.35) !important;
 }
 
+/* Optional: a subtle left border so it's obvious even if bg is similar */
+.variables-table tr.row-highlight > td:first-child {
+  box-shadow: inset 4px 0 0 0 rgba(255, 235, 59, 0.9) !important;
+}
 
 
  

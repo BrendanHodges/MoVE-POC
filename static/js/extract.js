@@ -153,30 +153,23 @@ function renderPills(items, varTypeKey = null) {
       ? item
       : (item.label ?? item.id ?? JSON.stringify(item));
 
-    const isVarPill = !!varTypeKey;
+    // ✅ Only var type 1 should quick-link
+    const isQuickLink = (varTypeKey === "county");
 
-    const removeBtn = isVarPill ? `
+    const removeBtn = varTypeKey ? `
       <button type="button"
         class="remove-pill-btn"
         data-vartype="${escapeHtml(varTypeKey)}"
         data-id="${escapeHtml(id)}"
         aria-label="Remove ${escapeHtml(label)}"
-        style="
-          margin-left:8px;
-          border:none;
-          background:transparent;
-          cursor:pointer;
-          font-size:1rem;
-          line-height:1;
-          color: var(--muted);
-        "
+        style="margin-left:8px;border:none;background:transparent;cursor:pointer;font-size:1rem;line-height:1;color:var(--muted);"
       >×</button>
     ` : "";
 
     return `
       <span
-        class="pill ${isVarPill ? "var-pill" : ""}"
-        ${isVarPill ? `data-id="${escapeHtml(id)}" data-vartype="${escapeHtml(varTypeKey)}"` : ""}
+        class="pill ${isQuickLink ? "var-pill-link" : ""}"
+        ${isQuickLink ? `data-id="${escapeHtml(id)}"` : ""}
         style="
           display:inline-flex;
           align-items:center;
@@ -186,7 +179,7 @@ function renderPills(items, varTypeKey = null) {
           font-size:0.85rem;
           margin:3px 6px 0 0;
           background: var(--panel, transparent);
-          ${isVarPill ? "cursor:pointer;" : ""}
+          ${isQuickLink ? "cursor:pointer;" : ""}
         "
       >
         ${escapeHtml(label)}
@@ -653,11 +646,16 @@ function initExtractorUI() {
         return;
       }
 
-      const pill = e.target.closest(".var-pill");
+      // ✅ Only type 1 pills have this class
+      const pill = e.target.closest(".var-pill-link");
       if (!pill) return;
 
       const id = pill.dataset.id;
-      window.parent.postMessage({ type: "JUMP_TO_VAR", id }, window.location.origin);
+
+      window.parent.postMessage(
+        { type: "JUMP_TO_VAR", id},
+        window.location.origin
+      );
     });
 
     clearButton.addEventListener("click", clearSelections);
